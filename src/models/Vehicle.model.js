@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const { statuses } = require("../validators/vehicle.validator");
-console.log(statuses);
 
 const VehicleSchema = new mongoose.Schema(
   {
