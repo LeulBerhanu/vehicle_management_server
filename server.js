@@ -1,13 +1,15 @@
 require("dotenv").config();
 const express = require("express");
+const cors = require("cors");
 const connectDB = require("./src/utiles/connectDB");
 const vehicleRouter = require("./src/routes/vehicle.routes");
 
 const app = express();
 
-connectDB();
+// connectDB();
 
 app.use(express.json());
+app.use(cors());
 
 app.use("/api/vehicles", vehicleRouter);
 
@@ -18,12 +20,20 @@ app.use((req, res, next) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  const message = err.message;
-  const stack = err.stack;
-  res.status(500).send({ message, stack });
+  console.error(err.stack); // Logs the error stack to the console
+  res
+    .status(err.status || 500)
+    .json({ message: err.message || "Internal Server Error" });
 });
 
-app.listen(
-  process.env.PORT,
-  console.log("Listening on port: ", process.env.PORT)
-);
+(async () => {
+  try {
+    await connectDB();
+    app.listen(
+      process.env.PORT,
+      console.log("Listening on port:", process.env.PORT)
+    );
+  } catch (error) {
+    console.error("Error during connection:", error);
+  }
+})();
